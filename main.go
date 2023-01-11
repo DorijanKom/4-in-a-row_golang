@@ -101,15 +101,8 @@ func (board *Board) makeMove(key int, piece string) error {
 			board.state[i][key-1] = piece
 			break
 		}
-	}
+	
 
 	return nil
 
-}
-
-func (board *Board) checkIfValidColRow(row, col int) error {
-	if col-row != 2 {
-		return fmt.Errorf("Board size invalid! The difference between rows and columns must be at most 2!")
-	}
-	return nil
 }
