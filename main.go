@@ -34,12 +34,20 @@ func main() {
 	for {
 		if turn%2 == 0 {
 			fmt.Scan(&key)
-			board.makeMove(key, player1)
+			err := board.makeMove(key, player1)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
 			board.printBoard()
 			turn++
 		} else {
 			fmt.Scan(&key)
-			board.makeMove(key, player2)
+			err := board.makeMove(key, player2)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
 			board.printBoard()
 			turn++
 		}
