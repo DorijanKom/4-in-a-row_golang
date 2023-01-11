@@ -4,9 +4,23 @@ import (
 	"fmt"
 )
 
+type Board struct {
+	state         [][]string
+	rows          int
+	cols          int
+	currentPlayer string
+}
+
+const (
+	emptyField string = " "
+	player1    string = "◯"
+	player2    string = "⬤"
+)
+
 func main() {
 
 	var row, col, key int
+	turn := 0
 
 	fmt.Println("Please input the number of rows for your game.")
 	fmt.Scan(&row)
@@ -14,34 +28,88 @@ func main() {
 	fmt.Println("Please enter the number of columns for your game.")
 	fmt.Scan(&col)
 
-	fmt.Println("Enter the space you want to enter your key.")
-	fmt.Scan(&key)
-
 	board := genBoard(row, col)
-	printBoard(board, key)
 
+	fmt.Println("input")
+	for {
+		if turn%2 == 0 {
+			fmt.Scan(&key)
+			err := board.makeMove(key, player1)
+			if err != nil {
+				fmt.Println(err)
+				board.printBoard()
+				continue
+			}
+			board.printBoard()
+			turn++
+		} else {
+			fmt.Scan(&key)
+			err := board.makeMove(key, player2)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			board.printBoard()
+			turn++
+		}
+
+	}
 }
 
-func genBoard(row, col int) [][]string {
-	board := make([][]string, row)
+func genBoard(row, col int) Board {
 
-	for i := range board {
-		board[i] = make([]string, col)
+	// Creates new board struct
+	board := Board{
+		state:         make([][]string, row),
+		rows:          row,
+		cols:          col,
+		currentPlayer: "",
+	}
+
+	// Generates the 2d array (state)
+	for i := range board.state {
+		board.state[i] = make([]string, col)
+		for j := range board.state[i] {
+			board.state[i][j] = emptyField
+		}
 	}
 
 	return board
 }
 
-func printBoard(board [][]string, key int) {
+func (board *Board) printBoard() {
 
-	for i := 0; i < len(board); i++ {
-		for j := 0; j < len(board[i]); j++ {
-			if board[len(board)-1][key-1] == "" {
-				board[len(board)-i-1][key-1] = "x"
-			}
-			fmt.Printf(" [ %s ] ", board[i][j])
+	for i := board.rows - 1; i >= 0; i-- {
+		for j := 0; j < board.cols; j++ {
+			fmt.Printf(" [ %s  ] ", board.state[i][j])
 		}
 		fmt.Println()
 	}
 
+}
+
+func (board *Board) makeMove(key int, piece string) error {
+	if key < 0 || key-1 >= board.cols {
+		return fmt.Errorf("invalid column")
+	}
+	if board.state[board.rows-1][key-1] != emptyField {
+		return fmt.Errorf("the column is full")
+	}
+
+	for i := 0; i < board.rows; i++ {
+		if board.state[i][key-1] == emptyField {
+			board.state[i][key-1] = piece
+			break
+		}
+	}
+
+	return nil
+
+}
+
+func (board *Board) checkIfValidColRow(row, col int) error {
+	if col-row != 2 {
+		return fmt.Errorf("Board size invalid! The difference between rows and columns must be at most 2!")
+	}
+	return nil
 }
