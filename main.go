@@ -101,7 +101,7 @@ func (board *Board) makeMove(key int, piece string) error {
 			board.state[i][key-1] = piece
 			break
 		}
-	
+	}
 
 	return nil
 
