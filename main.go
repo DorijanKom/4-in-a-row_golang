@@ -13,8 +13,8 @@ type Board struct {
 
 const (
 	emptyField string = " "
-	player1    string = "X"
-	player2    string = "O"
+	player1    string = "◯"
+	player2    string = "⬤"
 )
 
 func main() {
@@ -37,6 +37,7 @@ func main() {
 			err := board.makeMove(key, player1)
 			if err != nil {
 				fmt.Println(err)
+				board.printBoard()
 				continue
 			}
 			board.printBoard()
@@ -80,7 +81,7 @@ func (board *Board) printBoard() {
 
 	for i := board.rows - 1; i >= 0; i-- {
 		for j := 0; j < board.cols; j++ {
-			fmt.Printf(" [ %s ] ", board.state[i][j])
+			fmt.Printf(" [ %s  ] ", board.state[i][j])
 		}
 		fmt.Println()
 	}
@@ -104,4 +105,11 @@ func (board *Board) makeMove(key int, piece string) error {
 
 	return nil
 
+}
+
+func (board *Board) checkIfValidColRow(row, col int) error {
+	if col-row != 2 {
+		return fmt.Errorf("Board size invalid! The difference between rows and columns must be at most 2!")
+	}
+	return nil
 }
