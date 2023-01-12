@@ -22,50 +22,69 @@ var movesPlayerTwo []int
 
 func main() {
 
-	var row, col, key int
+	var row, col, key, userInput int
 	turn := 0
 
-	fmt.Println("Please input the number of rows for your game.")
-	fmt.Scan(&row)
-
-	fmt.Println("Please enter the number of columns for your game.")
-	fmt.Scan(&col)
-
-	board := genBoard(row, col)
-
-	board.printBoard()
-	fmt.Println("input")
 	for {
-		if turn%2 == 0 {
-			fmt.Scan(&key)
-			err := board.makeMove(key, player1)
-			if err != nil {
-				board.printBoard()
-				fmt.Println(err)
-				continue
-			}
-			board.printBoard()
-			turn++
-			moveHistory(key, &movesPlayerOne)
-			fmt.Printf("%v ", movesPlayerOne)
-			fmt.Println()
-			fmt.Printf("%v ", movesPlayerTwo)
-		} else {
-			fmt.Scan(&key)
-			err := board.makeMove(key, player2)
-			if err != nil {
-				board.printBoard()
-				fmt.Println(err)
-				continue
-			}
-			board.printBoard()
-			turn++
-			moveHistory(key, &movesPlayerTwo)
-			fmt.Printf("%v ", movesPlayerOne)
-			fmt.Println()
-			fmt.Printf("%v ", movesPlayerTwo)
+
+		fmt.Println("Press 1 for default board size - Press 2 for custom size")
+		fmt.Scan(&userInput)
+
+		if userInput == 1 {
+			row = 6
+			col = 7
 		}
 
+		if userInput == 2 {
+			fmt.Println("Please input the number of rows for your game.")
+			fmt.Scan(&row)
+
+			fmt.Println("Please enter the number of columns for your game.")
+			fmt.Scan(&col)
+
+		}
+
+		if checkRowCol(row, col) {
+			board := genBoard(row, col)
+
+			board.printBoard()
+			fmt.Println("input")
+			for {
+				if turn%2 == 0 {                    // if turn counter is even then it's player1's turn, else it's player2's turn
+					fmt.Scan(&key)                      // takes user input
+					err := board.makeMove(key, player1) //cals make move function and saves response into the err variable
+					if err != nil {                     // checks for errors and handles them accordingly
+						board.printBoard()
+						fmt.Println(err)
+						continue
+					}
+					board.printBoard()
+							turn++
+			        moveHistory(key, &movesPlayerOne)
+			        fmt.Printf("%v ", movesPlayerOne)
+			        fmt.Println()
+			        fmt.Printf("%v ", movesPlayerTwo)
+          
+		  } else {
+			  fmt.Scan(&key)
+			  err := board.makeMove(key, player2)
+			  if err != nil {
+				board.printBoard()
+				fmt.Println(err)
+				continue
+			}
+			board.printBoard()
+			  turn++
+			  moveHistory(key, &movesPlayerTwo)
+			  fmt.Printf("%v ", movesPlayerOne)
+			  fmt.Println()
+			  fmt.Printf("%v ", movesPlayerTwo)
+				}
+
+			}
+		}
+
+		fmt.Println("The size difference between rows and cols must be at most 2")
 	}
 }
 
@@ -120,8 +139,12 @@ func (board *Board) makeMove(key int, piece string) error {
 
 }
 
+
 func moveHistory(key int, moves *[]int) {
 
 	*moves = append(*moves, key)
 
+
+func checkRowCol(row, col int) bool {
+	return col-row == 2 || col-row <= 2 && col > 6 && row > 5
 }
