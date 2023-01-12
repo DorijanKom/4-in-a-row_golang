@@ -53,8 +53,7 @@ func main() {
 			}
 			board.printBoard()
 			turn++
-		}
-
+		}	
 	}
 }
 
@@ -108,3 +107,41 @@ func (board *Board) makeMove(key int, piece string) error {
 	return nil
 
 }
+
+func (board *Board) endGame(piece string) bool {
+	
+
+	//horizontal check
+	for j:=0;j<board.rows-3;j++{
+			for i:=0;i<board.rows;i++{
+					if board.state[i][j] == piece && board.state[i][j+1] == piece && board.state[i][j+2] == piece && board.state[i][j+3] == piece{
+							fmt.Println("Victory")
+						} 
+				}
+		}
+	//vertical check
+	for i:=0;i<board.cols-3;i++{
+		for j:=0;j<board.rows;j++{
+			if board.state[i][j]== piece && board.state[i][j+1] == piece && board.state[i][j+2] == piece && board.state[i][j+3] == piece{
+				fmt.Println("Victory")
+			}
+		}
+	}
+	//diagonal check left
+	for i:=3; i<board.cols;i++{
+		for j:=0;j<board.rows-3;j++{
+			if board.state[i][j] == piece && board.state[i-1][j+1] == piece && board.state[i-2][j+2] == piece && board.state[i-3][j+3]==piece{
+				fmt.Println("Victory")
+			}
+		}
+	}
+	//diagonal check right
+	for i:=0; i<board.cols;i++{
+		for j:=3; j<board.rows-3; j++{
+			if board.state[i][j] == piece && board.state[i-1][j-1] == piece && board.state[i-2][j-2] == piece && board.state [i-3][j-3]==piece{
+				fmt.Println("Victory")
+			}
+		}
+	}
+  return false
+} 
