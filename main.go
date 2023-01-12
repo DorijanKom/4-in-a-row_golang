@@ -30,14 +30,15 @@ func main() {
 
 	board := genBoard(row, col)
 
+	board.printBoard()
 	fmt.Println("input")
 	for {
 		if turn%2 == 0 {
 			fmt.Scan(&key)
 			err := board.makeMove(key, player1)
 			if err != nil {
-				fmt.Println(err)
 				board.printBoard()
+				fmt.Println(err)
 				continue
 			}
 			board.printBoard()
@@ -46,6 +47,7 @@ func main() {
 			fmt.Scan(&key)
 			err := board.makeMove(key, player2)
 			if err != nil {
+				board.printBoard()
 				fmt.Println(err)
 				continue
 			}
