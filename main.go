@@ -17,6 +17,9 @@ const (
 	player2    string = "⬤"
 )
 
+var movesPlayerOne []int
+var movesPlayerTwo []int
+
 func main() {
 
 	var row, col, key int
@@ -43,6 +46,10 @@ func main() {
 			}
 			board.printBoard()
 			turn++
+			moveHistory(key, &movesPlayerOne)
+			fmt.Printf("%v ", movesPlayerOne)
+			fmt.Println()
+			fmt.Printf("%v ", movesPlayerTwo)
 		} else {
 			fmt.Scan(&key)
 			err := board.makeMove(key, player2)
@@ -53,6 +60,10 @@ func main() {
 			}
 			board.printBoard()
 			turn++
+			moveHistory(key, &movesPlayerTwo)
+			fmt.Printf("%v ", movesPlayerOne)
+			fmt.Println()
+			fmt.Printf("%v ", movesPlayerTwo)
 		}
 
 	}
@@ -106,5 +117,11 @@ func (board *Board) makeMove(key int, piece string) error {
 	}
 
 	return nil
+
+}
+
+func moveHistory(key int, moves *[]int) {
+
+	*moves = append(*moves, key)
 
 }
