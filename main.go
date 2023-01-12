@@ -17,6 +17,9 @@ const (
 	player2    string = "⬤"
 )
 
+var movesPlayerOne []int
+var movesPlayerTwo []int
+
 func main() {
 
 	var row, col, key, userInput int
@@ -47,7 +50,7 @@ func main() {
 			board.printBoard()
 			fmt.Println("input")
 			for {
-				if turn%2 == 0 { // if turn counter is even then it's player1's turn, else it's player2's turn
+				if turn%2 == 0 {                    // if turn counter is even then it's player1's turn, else it's player2's turn
 					fmt.Scan(&key)                      // takes user input
 					err := board.makeMove(key, player1) //cals make move function and saves response into the err variable
 					if err != nil {                     // checks for errors and handles them accordingly
@@ -56,17 +59,26 @@ func main() {
 						continue
 					}
 					board.printBoard()
-					turn++
-				} else {
-					fmt.Scan(&key)
-					err := board.makeMove(key, player2)
-					if err != nil {
-						board.printBoard()
-						fmt.Println(err)
-						continue
-					}
-					board.printBoard()
-					turn++
+							turn++
+			        moveHistory(key, &movesPlayerOne)
+			        fmt.Printf("%v ", movesPlayerOne)
+			        fmt.Println()
+			        fmt.Printf("%v ", movesPlayerTwo)
+          
+		  } else {
+			  fmt.Scan(&key)
+			  err := board.makeMove(key, player2)
+			  if err != nil {
+				board.printBoard()
+				fmt.Println(err)
+				continue
+			}
+			board.printBoard()
+			  turn++
+			  moveHistory(key, &movesPlayerTwo)
+			  fmt.Printf("%v ", movesPlayerOne)
+			  fmt.Println()
+			  fmt.Printf("%v ", movesPlayerTwo)
 				}
 
 			}
@@ -126,6 +138,12 @@ func (board *Board) makeMove(key int, piece string) error {
 	return nil
 
 }
+
+
+func moveHistory(key int, moves *[]int) {
+
+	*moves = append(*moves, key)
+
 
 func checkRowCol(row, col int) bool {
 	return col-row == 2 || col-row <= 2 && col > 6 && row > 5
