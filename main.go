@@ -1,14 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 )
 
 type Board struct {
-	state         [][]string
-	rows          int
-	cols          int
-	currentPlayer string
+	State          [][]string
+	Rows           int
+	Cols           int
+	MovesPlayerOne []int
+	MovesPlayerTwo []int
 }
 
 const (
@@ -16,9 +20,6 @@ const (
 	player1    string = "◯"
 	player2    string = "⬤"
 )
-
-var movesPlayerOne []int
-var movesPlayerTwo []int
 
 func main() {
 
@@ -60,10 +61,10 @@ func main() {
 					}
 					board.printBoard()
 					turn++
-					moveHistory(key, &movesPlayerOne)
-					fmt.Printf("%v ", movesPlayerOne)
+					moveHistory(key, &board.MovesPlayerOne)
+					fmt.Printf("%v ", board.MovesPlayerOne)
 					fmt.Println()
-					fmt.Printf("%v ", movesPlayerTwo)
+					fmt.Printf("%v ", board.MovesPlayerTwo)
 
 				} else {
 					fmt.Scan(&key)
@@ -75,10 +76,10 @@ func main() {
 					}
 					board.printBoard()
 					turn++
-					moveHistory(key, &movesPlayerTwo)
-					fmt.Printf("%v ", movesPlayerOne)
+					moveHistory(key, &board.MovesPlayerTwo)
+					fmt.Printf("%v ", board.MovesPlayerOne)
 					fmt.Println()
-					fmt.Printf("%v ", movesPlayerTwo)
+					fmt.Printf("%v ", board.MovesPlayerTwo)
 				}
 
 			}
@@ -93,17 +94,16 @@ func genBoard(row, col int) Board {
 
 	// Creates new board struct
 	board := Board{
-		state:         make([][]string, row),
-		rows:          row,
-		cols:          col,
-		currentPlayer: "",
+		State: make([][]string, row),
+		Rows:  row,
+		Cols:  col,
 	}
 
 	// Generates the 2d array (state)
-	for i := range board.state {
-		board.state[i] = make([]string, col)
-		for j := range board.state[i] {
-			board.state[i][j] = emptyField
+	for i := range board.State {
+		board.State[i] = make([]string, col)
+		for j := range board.State[i] {
+			board.State[i][j] = emptyField
 		}
 	}
 
@@ -112,9 +112,9 @@ func genBoard(row, col int) Board {
 
 func (board *Board) printBoard() {
 
-	for i := board.rows - 1; i >= 0; i-- {
-		for j := 0; j < board.cols; j++ {
-			fmt.Printf(" [ %s  ] ", board.state[i][j])
+	for i := board.Rows - 1; i >= 0; i-- {
+		for j := 0; j < board.Cols; j++ {
+			fmt.Printf(" [ %s  ] ", board.State[i][j])
 		}
 		fmt.Println()
 	}
@@ -122,16 +122,16 @@ func (board *Board) printBoard() {
 }
 
 func (board *Board) makeMove(key int, piece string) error {
-	if key < 0 || key-1 >= board.cols {
+	if key < 0 || key-1 >= board.Cols {
 		return fmt.Errorf("invalid column")
 	}
-	if board.state[board.rows-1][key-1] != emptyField {
+	if board.State[board.Rows-1][key-1] != emptyField {
 		return fmt.Errorf("the column is full")
 	}
 
-	for i := 0; i < board.rows; i++ {
-		if board.state[i][key-1] == emptyField {
-			board.state[i][key-1] = piece
+	for i := 0; i < board.Rows; i++ {
+		if board.State[i][key-1] == emptyField {
+			board.State[i][key-1] = piece
 			break
 		}
 	}
@@ -143,33 +143,33 @@ func (board *Board) makeMove(key int, piece string) error {
 func (board *Board) endGame(piece string) bool {
 
 	//horizontal check
-	for j := 0; j < board.rows-3; j++ {
-		for i := 0; i < board.rows; i++ {
-			if board.state[i][j] == piece && board.state[i][j+1] == piece && board.state[i][j+2] == piece && board.state[i][j+3] == piece {
+	for j := 0; j < board.Rows-3; j++ {
+		for i := 0; i < board.Rows; i++ {
+			if board.State[i][j] == piece && board.State[i][j+1] == piece && board.State[i][j+2] == piece && board.State[i][j+3] == piece {
 				fmt.Println("Victory")
 			}
 		}
 	}
 	//vertical check
-	for i := 0; i < board.cols-3; i++ {
-		for j := 0; j < board.rows; j++ {
-			if board.state[i][j] == piece && board.state[i][j+1] == piece && board.state[i][j+2] == piece && board.state[i][j+3] == piece {
+	for i := 0; i < board.Cols-3; i++ {
+		for j := 0; j < board.Rows; j++ {
+			if board.State[i][j] == piece && board.State[i][j+1] == piece && board.State[i][j+2] == piece && board.State[i][j+3] == piece {
 				fmt.Println("Victory")
 			}
 		}
 	}
 	//diagonal check left
-	for i := 3; i < board.cols; i++ {
-		for j := 0; j < board.rows-3; j++ {
-			if board.state[i][j] == piece && board.state[i-1][j+1] == piece && board.state[i-2][j+2] == piece && board.state[i-3][j+3] == piece {
+	for i := 3; i < board.Cols; i++ {
+		for j := 0; j < board.Rows-3; j++ {
+			if board.State[i][j] == piece && board.State[i-1][j+1] == piece && board.State[i-2][j+2] == piece && board.State[i-3][j+3] == piece {
 				fmt.Println("Victory")
 			}
 		}
 	}
 	//diagonal check right
-	for i := 0; i < board.cols; i++ {
-		for j := 3; j < board.rows-3; j++ {
-			if board.state[i][j] == piece && board.state[i-1][j-1] == piece && board.state[i-2][j-2] == piece && board.state[i-3][j-3] == piece {
+	for i := 0; i < board.Cols; i++ {
+		for j := 3; j < board.Rows-3; j++ {
+			if board.State[i][j] == piece && board.State[i-1][j-1] == piece && board.State[i-2][j-2] == piece && board.State[i-3][j-3] == piece {
 				fmt.Println("Victory")
 			}
 		}
@@ -184,4 +184,89 @@ func moveHistory(key int, moves *[]int) {
 
 func checkRowCol(row, col int) bool {
 	return col-row == 2 || col-row <= 2 && col > 6 && row > 5
+}
+
+func (board *Board) saveGame(fileName string) error {
+	file, err := os.Create(fileName)
+
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	data, err := json.MarshalIndent(board, "", "   ")
+	if err != nil {
+		return err
+	}
+
+	_, err = file.Write(data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (board *Board) loadGame(fileName string) error {
+	file, err := os.Open(fileName)
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	decoder := json.NewDecoder(file)
+
+	err = decoder.Decode(board)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func loadGameList() {
+	files, err := getSavedGames()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	if len(files) == 0 {
+		fmt.Println("There aren't any saved games.")
+		return
+	}
+
+	fmt.Println("Select a game to load: ")
+	for i, file := range files {
+		fmt.Printf("%d. %s\n", i+1, file)
+	}
+
+	var input int
+	fmt.Scan(&input)
+
+	if input < 1 || input > len(files) {
+		fmt.Println("Invalid selection!")
+		return
+	}
+
+	board := &Board{}
+	err = board.loadGame(files[input-1])
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println("Game loaded")
+	board.printBoard()
+
+}
+
+func getSavedGames() ([]string, error) {
+	files, err := filepath.Glob("*.json")
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
 }
