@@ -67,13 +67,16 @@ func (board *Board) MakeMove(key int, piece string) error {
 
 }
 
-func (board *Board) EndGame(piece string) bool {
+func (board *Board) EndGame(piece, player1 string) string {
 
 	//horizontal check
 	for j := 0; j < board.Rows-3; j++ {
 		for i := 0; i < board.Rows; i++ {
-			if board.State[i][j] == piece && board.State[i][j+1] == piece && board.State[i][j+2] == piece && board.State[i][j+3] == piece {
-				fmt.Println("Victory")
+			if board.State[i][j] == piece && board.State[i+1][j] == piece && board.State[i+2][j] == piece && board.State[i+3][j] == piece {
+				if piece == player1 {
+					return "Player 1 wins"
+				}
+				return "Player 2 wins"
 			}
 		}
 	}
@@ -81,7 +84,10 @@ func (board *Board) EndGame(piece string) bool {
 	for i := 0; i < board.Cols-3; i++ {
 		for j := 0; j < board.Rows; j++ {
 			if board.State[i][j] == piece && board.State[i][j+1] == piece && board.State[i][j+2] == piece && board.State[i][j+3] == piece {
-				fmt.Println("Victory")
+				if piece == player1 {
+					return "Player 1 wins"
+				}
+				return "Player 2 wins"
 			}
 		}
 	}
@@ -89,7 +95,10 @@ func (board *Board) EndGame(piece string) bool {
 	for i := 3; i < board.Cols; i++ {
 		for j := 0; j < board.Rows-3; j++ {
 			if board.State[i][j] == piece && board.State[i-1][j+1] == piece && board.State[i-2][j+2] == piece && board.State[i-3][j+3] == piece {
-				fmt.Println("Victory")
+				if piece == player1 {
+					return "Player 1 wins"
+				}
+				return "Player 2 wins"
 			}
 		}
 	}
@@ -97,11 +106,14 @@ func (board *Board) EndGame(piece string) bool {
 	for i := 0; i < board.Cols; i++ {
 		for j := 3; j < board.Rows-3; j++ {
 			if board.State[i][j] == piece && board.State[i-1][j-1] == piece && board.State[i-2][j-2] == piece && board.State[i-3][j-3] == piece {
-				fmt.Println("Victory")
+				if piece == player1 {
+					return "Player 1 wins"
+				}
+				return "Player 2 wins"
 			}
 		}
 	}
-	return false
+	return "Draw"
 }
 
 func (board *Board) SaveGame(fileName string) error {
