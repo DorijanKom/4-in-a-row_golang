@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type Board struct {
@@ -13,6 +14,7 @@ type Board struct {
 	Cols           int
 	MovesPlayerOne []int
 	MovesPlayerTwo []int
+	Turn           int
 }
 
 const emptyField string = " "
@@ -24,6 +26,7 @@ func GenBoard(row, col int) *Board {
 		State: make([][]string, row),
 		Rows:  row,
 		Cols:  col,
+		Turn:  0,
 	}
 
 	// Generates the 2d array (state)
@@ -39,7 +42,7 @@ func GenBoard(row, col int) *Board {
 
 func (board *Board) PrintBoard() {
 
-	for i := board.Rows - 1; i >= 0; i-- {
+	for i := 0; i < board.Rows; i++ {
 		for j := 0; j < board.Cols; j++ {
 			fmt.Printf(" [ %s  ] ", board.State[i][j])
 		}
@@ -49,45 +52,34 @@ func (board *Board) PrintBoard() {
 }
 
 func (board *Board) MakeMove(key int, piece string) error {
-	if key < 0 || key-1 >= board.Cols {
+	if key < 1 || key > board.Cols {
 		return fmt.Errorf("invalid column")
 	}
-	if board.State[board.Rows-1][key-1] != emptyField {
-		return fmt.Errorf("the column is full")
-	}
 
-	for i := 0; i < board.Rows; i++ {
+	for i := board.Rows - 1; i >= 0; i-- {
 		if board.State[i][key-1] == emptyField {
 			board.State[i][key-1] = piece
-			break
+			return nil
 		}
 	}
-
-	return nil
-
+	return fmt.Errorf("the column is full")
 }
 
-func (board *Board) EndGame(piece, player1 string) string {
+func (board *Board) EndGame(piece string) string {
 
 	//horizontal check
-	for j := 0; j < board.Rows-3; j++ {
+	for j := 0; j < board.Cols-3; j++ {
 		for i := 0; i < board.Rows; i++ {
-			if board.State[i][j] == piece && board.State[i+1][j] == piece && board.State[i+2][j] == piece && board.State[i+3][j] == piece {
-				if piece == player1 {
-					return "Player 1 wins"
-				}
-				return "Player 2 wins"
+			if board.State[i][j] == piece && board.State[i][j+1] == piece && board.State[i][j+2] == piece && board.State[i][j+3] == piece {
+				return piece
 			}
 		}
 	}
 	//vertical check
-	for i := 0; i < board.Cols-3; i++ {
-		for j := 0; j < board.Rows; j++ {
-			if board.State[i][j] == piece && board.State[i][j+1] == piece && board.State[i][j+2] == piece && board.State[i][j+3] == piece {
-				if piece == player1 {
-					return "Player 1 wins"
-				}
-				return "Player 2 wins"
+	for i := 0; i < board.Rows-3; i++ {
+		for j := 0; j < board.Cols; j++ {
+			if board.State[i][j] == piece && board.State[i+1][j] == piece && board.State[i+2][j] == piece && board.State[i+3][j] == piece {
+				return piece
 			}
 		}
 	}
@@ -95,10 +87,7 @@ func (board *Board) EndGame(piece, player1 string) string {
 	for i := 3; i < board.Cols; i++ {
 		for j := 0; j < board.Rows-3; j++ {
 			if board.State[i][j] == piece && board.State[i-1][j+1] == piece && board.State[i-2][j+2] == piece && board.State[i-3][j+3] == piece {
-				if piece == player1 {
-					return "Player 1 wins"
-				}
-				return "Player 2 wins"
+				return piece
 			}
 		}
 	}
@@ -106,18 +95,30 @@ func (board *Board) EndGame(piece, player1 string) string {
 	for i := 0; i < board.Cols; i++ {
 		for j := 3; j < board.Rows-3; j++ {
 			if board.State[i][j] == piece && board.State[i-1][j-1] == piece && board.State[i-2][j-2] == piece && board.State[i-3][j-3] == piece {
-				if piece == player1 {
-					return "Player 1 wins"
-				}
-				return "Player 2 wins"
+				return piece
 			}
 		}
 	}
-	return "Draw"
+
+	// Check if draw
+	for i := 0; i < board.Rows; i++ {
+		for j := 0; j < board.Cols; j++ {
+			if board.State[i][j] == emptyField {
+				return "Draw"
+			}
+		}
+	}
+	return ""
 }
 
 func (board *Board) SaveGame(fileName string) error {
-	file, err := os.Create(fileName)
+	if !strings.HasSuffix(fileName, ".json") {
+		fileName += ".json"
+	}
+
+	save := strings.TrimSpace(fileName)
+
+	file, err := os.Create(save)
 
 	if err != nil {
 		return err
@@ -135,10 +136,13 @@ func (board *Board) SaveGame(fileName string) error {
 		return err
 	}
 
+	fmt.Println("Game saved!")
+	board.PrintBoard()
 	return nil
 }
 
 func (board *Board) loadGame(fileName string) error {
+
 	file, err := os.Open(fileName)
 	if err != nil {
 		return err
@@ -198,4 +202,12 @@ func getSavedGames() ([]string, error) {
 	}
 
 	return files, nil
+}
+
+func (board *Board) PrintMoves() {
+	fmt.Println()
+	fmt.Printf("%v ", board.MovesPlayerOne)
+	fmt.Println()
+	fmt.Printf("%v ", board.MovesPlayerTwo)
+	fmt.Println()
 }
