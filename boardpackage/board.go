@@ -65,50 +65,52 @@ func (board *Board) MakeMove(key int, piece string) error {
 	return fmt.Errorf("the column is full")
 }
 
-func (board *Board) EndGame(piece string) string {
+func (board *Board) EndGame() (bool, string) {
 
-	//horizontal check
-	for j := 0; j < board.Cols-3; j++ {
-		for i := 0; i < board.Rows; i++ {
-			if board.State[i][j] == piece && board.State[i][j+1] == piece && board.State[i][j+2] == piece && board.State[i][j+3] == piece {
-				return piece
+	// check for horizontal win
+	for i := 0; i < board.Rows; i++ {
+		for j := 0; j < board.Cols-3; j++ {
+			if board.State[i][j] != "" && board.State[i][j] == board.State[i][j+1] && board.State[i][j] == board.State[i][j+2] && board.State[i][j] == board.State[i][j+3] {
+				return true, board.State[i][j]
 			}
 		}
 	}
-	//vertical check
+	// check for vertical win
 	for i := 0; i < board.Rows-3; i++ {
 		for j := 0; j < board.Cols; j++ {
-			if board.State[i][j] == piece && board.State[i+1][j] == piece && board.State[i+2][j] == piece && board.State[i+3][j] == piece {
-				return piece
+			if board.State[i][j] != "" && board.State[i][j] == board.State[i+1][j] && board.State[i][j] == board.State[i+2][j] && board.State[i][j] == board.State[i+3][j] {
+				return true, board.State[i][j]
 			}
 		}
 	}
-	//diagonal check left
-	for i := 3; i < board.Cols; i++ {
-		for j := 0; j < board.Rows-3; j++ {
-			if board.State[i][j] == piece && board.State[i-1][j+1] == piece && board.State[i-2][j+2] == piece && board.State[i-3][j+3] == piece {
-				return piece
+	// check for diagonal win (left to right)
+	for i := 0; i < board.Rows-3; i++ {
+		for j := 0; j < board.Cols-3; j++ {
+			if board.State[i][j] != "" && board.State[i][j] == board.State[i+1][j+1] && board.State[i][j] == board.State[i+2][j+2] && board.State[i][j] == board.State[i+3][j+3] {
+				return true, board.State[i][j]
 			}
 		}
 	}
-	//diagonal check right
-	for i := 0; i < board.Cols; i++ {
-		for j := 3; j < board.Rows-3; j++ {
-			if board.State[i][j] == piece && board.State[i-1][j-1] == piece && board.State[i-2][j-2] == piece && board.State[i-3][j-3] == piece {
-				return piece
+	// check for diagonal win (right to left)
+	for i := 0; i < board.Rows-3; i++ {
+		for j := 3; j < board.Cols; j++ {
+			if board.State[i][j] != "" && board.State[i][j] == board.State[i+1][j-1] && board.State[i][j] == board.State[i+2][j-2] && board.State[i][j] == board.State[i+3][j-3] {
+				return true, board.State[i][j]
 			}
 		}
 	}
 
-	// Check if draw
+	// check if the board is full
 	for i := 0; i < board.Rows; i++ {
 		for j := 0; j < board.Cols; j++ {
-			if board.State[i][j] == emptyField {
-				return "Draw"
+			if board.State[i][j] == "" {
+				return false, ""
 			}
 		}
 	}
-	return ""
+
+	return true, "Draw"
+
 }
 
 func (board *Board) SaveGame(fileName string) error {

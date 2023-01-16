@@ -58,102 +58,19 @@ func main() {
 			fmt.Println("input")
 			for {
 				if board.Turn%2 == 0 { // if turn counter is even then it's player1's turn, else it's player2's turn
-					reader.Scan() // takes user input
-					consoleInput := reader.Text()
-					if consoleInput == "S" || consoleInput == "s" {
-						reader.Scan()
-						filename := reader.Text()
-						board.SaveGame(filename)
-						continue
-					} else if consoleInput == "L" || consoleInput == "l" {
-						board.LoadGameList()
-						continue
-					} else if consoleInput == "E" || consoleInput == "e" {
-						break
-					}
-					keyInput, _ := strconv.ParseInt(consoleInput, 10, 64)
-					key = int(keyInput)
-					err := board.MakeMove(key, player1) //cals make move function and saves response into the err variable
-					if err != nil {                     // checks for errors and handles them accordingly
-						board.PrintBoard()
-						fmt.Println(err)
-						continue
-					}
+					bottomUi(reader, board, &key)
 					board.PrintBoard()
 					board.Turn++
 					moveHistory(key, &board.MovesPlayerOne)
 					board.PrintMoves()
-					if board.EndGame(player1) == player1 {
-						fmt.Printf("Player 1 %s Victory!!!\n", player1)
-						fmt.Println("Play again? Y/N")
-						reader.Scan()
-						response := reader.Text()
-						if response == "Y" || response == "y" {
-							break
-						} else if response == "N" || response == "n" {
-							os.Exit(1)
-						}
-
-					} else if board.EndGame(player1) == "Draw" {
-						fmt.Println("The game is a draw")
-						fmt.Println("Play again? Y/N")
-						reader.Scan()
-						response := reader.Text()
-						if response == "Y" || response == "y" {
-							break
-						} else if response == "N" || response == "n" {
-							os.Exit(1)
-						}
-					}
+					checkForEnd(reader, player1, board)
 				} else {
-					reader.Scan()
-					consoleInput := reader.Text()
-
-					if consoleInput == "S" || consoleInput == "s" {
-						reader.Scan()
-						filename := reader.Text()
-						board.SaveGame(filename)
-						continue
-					} else if consoleInput == "L" || consoleInput == "l" {
-						board.LoadGameList()
-						continue
-					} else if consoleInput == "E" || consoleInput == "e" {
-						break
-					}
-					keyInput, _ := strconv.ParseInt(consoleInput, 10, 64)
-					key = int(keyInput)
-					err := board.MakeMove(key, player2)
-					if err != nil {
-						board.PrintBoard()
-						fmt.Println(err)
-						continue
-					}
+					bottomUi(reader, board, &key)
 					board.PrintBoard()
 					board.Turn++
 					moveHistory(key, &board.MovesPlayerTwo)
 					board.PrintMoves()
-					if board.EndGame(player2) == player2 {
-						fmt.Printf("Player 2 %s Victory!!!\n", player2)
-						fmt.Println("Play again? Y/N")
-						reader.Scan()
-						response := reader.Text()
-						if response == "Y" || response == "y" {
-							break
-						} else if response == "N" || response == "n" {
-							os.Exit(1)
-						}
-
-					} else if board.EndGame(player2) == "Draw" {
-						fmt.Println("The game is a draw")
-						fmt.Println("Play again? Y/N")
-						reader.Scan()
-						response := reader.Text()
-						if response == "Y" || response == "y" {
-							break
-						} else if response == "N" || response == "n" {
-							os.Exit(1)
-						}
-					}
+					checkForEnd(reader, player2, board)
 				}
 			}
 		}
@@ -162,107 +79,24 @@ func main() {
 			board.LoadGameList()
 			for {
 				if board.Turn%2 == 0 { // if turn counter is even then it's player1's turn, else it's player2's turn
-					reader.Scan() // takes user input
-					consoleInput := reader.Text()
-					if consoleInput == "S" || consoleInput == "s" {
-						reader.Scan()
-						filename := reader.Text()
-						board.SaveGame(filename)
-						continue
-					} else if consoleInput == "L" || consoleInput == "l" {
-						board.LoadGameList()
-						continue
-					} else if consoleInput == "E" || consoleInput == "e" {
-						break
-					}
-					keyInput, _ := strconv.ParseInt(consoleInput, 10, 64)
-					key = int(keyInput)
-					err := board.MakeMove(key, player1) //cals make move function and saves response into the err variable
-					if err != nil {                     // checks for errors and handles them accordingly
-						board.PrintBoard()
-						fmt.Println(err)
-						continue
-					}
+					bottomUi(reader, board, &key)
 					board.PrintBoard()
 					board.Turn++
 					moveHistory(key, &board.MovesPlayerOne)
 					board.PrintMoves()
-					if board.EndGame(player1) == player1 {
-						fmt.Printf("Player 1 %s Victory!!!\n", player1)
-						fmt.Println("Play again? Y/N")
-						reader.Scan()
-						response := reader.Text()
-						if response == "Y" || response == "y" {
-							break
-						} else if response == "N" || response == "n" {
-							os.Exit(1)
-						}
-
-					} else if board.EndGame(player1) == "Draw" {
-						fmt.Println("The game is a draw")
-						fmt.Println("Play again? Y/N")
-						reader.Scan()
-						response := reader.Text()
-						if response == "Y" || response == "y" {
-							break
-						} else if response == "N" || response == "n" {
-							os.Exit(1)
-						}
-					}
-
+					checkForEnd(reader, player1, board)
 				} else {
-					reader.Scan()
-					consoleInput := reader.Text()
-
-					if consoleInput == "S" || consoleInput == "s" {
-						reader.Scan()
-						filename := reader.Text()
-						board.SaveGame(filename)
-						continue
-					} else if consoleInput == "L" || consoleInput == "l" {
-						board.LoadGameList()
-						continue
-					} else if consoleInput == "E" || consoleInput == "e" {
-						break
-					}
-					keyInput, _ := strconv.ParseInt(consoleInput, 10, 64)
-					key = int(keyInput)
-					err := board.MakeMove(key, player2)
-					if err != nil {
-						board.PrintBoard()
-						fmt.Println(err)
-						continue
-					}
+					bottomUi(reader, board, &key)
 					board.PrintBoard()
 					board.Turn++
 					moveHistory(key, &board.MovesPlayerTwo)
 					board.PrintMoves()
-					if board.EndGame(player2) == player2 {
-						fmt.Printf("Player 2 %s Victory!!!\n", player2)
-						fmt.Println("Play again? Y/N")
-						reader.Scan()
-						response := reader.Text()
-						if response == "Y" || response == "y" {
-							break
-						} else if response == "N" || response == "n" {
-							os.Exit(1)
-						}
-
-					} else if board.EndGame(player2) == "Draw" {
-						fmt.Println("The game is a draw")
-						fmt.Println("Play again? Y/N")
-						reader.Scan()
-						response := reader.Text()
-						if response == "Y" || response == "y" {
-							break
-						} else if response == "N" || response == "n" {
-							os.Exit(1)
-						}
-					}
+					checkForEnd(reader, player2, board)
 				}
 			}
 		}
 		if userInput == 3 {
+			fmt.Println("Goodbye...")
 			os.Exit(1)
 		}
 
@@ -277,4 +111,58 @@ func moveHistory(key int, moves *[]int) {
 
 func checkRowCol(row, col int) bool {
 	return row >= 6 && col >= 7 && (col-row) <= 2
+}
+
+func checkForEnd(reader *bufio.Scanner, piece string, board *boardpackage.Board) {
+	gameOver, winner := board.EndGame()
+	if gameOver {
+		if winner == "Draw" {
+			fmt.Println("The game is a draw.")
+			fmt.Println("Play again? Y/N")
+			reader.Scan()
+			response := reader.Text()
+			if response == "Y" || response == "y" {
+				return
+			} else if response == "N" || response == "n" {
+				os.Exit(1)
+			}
+		} else {
+			fmt.Printf("Player %s  is the winner\n", piece)
+			fmt.Println("Play again? Y/N")
+			reader.Scan()
+			response := reader.Text()
+			if response == "Y" || response == "y" {
+				return
+			} else if response == "N" || response == "n" {
+				fmt.Println("Goodbye...")
+				os.Exit(1)
+			}
+		}
+
+	}
+}
+
+func bottomUi(reader *bufio.Scanner, board *boardpackage.Board, key *int) {
+	reader.Scan()
+	consoleInput := reader.Text()
+
+	if consoleInput == "S" || consoleInput == "s" {
+		reader.Scan()
+		filename := reader.Text()
+		board.SaveGame(filename)
+		return
+	} else if consoleInput == "L" || consoleInput == "l" {
+		board.LoadGameList()
+		return
+	} else if consoleInput == "E" || consoleInput == "e" {
+		fmt.Println("Ending game...")
+		return
+	}
+	keyInput, _ := strconv.ParseInt(consoleInput, 10, 64)
+	*key = int(keyInput)
+	err := board.MakeMove(*key, player2)
+	if err != nil {
+		board.PrintBoard()
+		fmt.Println(err)
+	}
 }
