@@ -190,6 +190,7 @@ func bottomUi(reader *bufio.Scanner, board *boardpackage.Board, key *int, player
 	consoleInput := reader.Text()
 
 	if consoleInput == "S" || consoleInput == "s" {
+		fmt.Printf("Name your save: ")
 		reader.Scan()
 		filename := reader.Text()
 		board.SaveGame(filename)

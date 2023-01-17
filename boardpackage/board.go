@@ -143,7 +143,7 @@ func (board *Board) SaveGame(fileName string) error {
 
 	save := strings.TrimSpace(fileName)
 
-	file, err := os.Create(save)
+	file, err := os.Create("saves/" + save)
 
 	if err != nil {
 		return err
@@ -227,7 +227,7 @@ func (board *Board) LoadGameList() {
 }
 
 func getSavedGames() ([]string, error) {
-	files, err := filepath.Glob("*.json")
+	files, err := filepath.Glob("saves/*.json")
 	if err != nil {
 		return nil, err
 	}
