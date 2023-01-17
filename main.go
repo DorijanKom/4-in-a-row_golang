@@ -55,7 +55,8 @@ func main() {
 			board := boardpackage.GenBoard(row, col)
 
 			board.PrintBoard()
-			fmt.Println("input")
+			fmt.Println()
+			fmt.Println("Press S or s to save - Press L or l to load - Press E or e to exit")
 			for {
 				if board.Turn%2 == 0 { // if turn counter is even then it's player1's turn, else it's player2's turn
 					consoleOutput := bottomUi(reader, board, &key, player1)
@@ -67,6 +68,8 @@ func main() {
 						break
 					} else if consoleOutput == "" {
 						board.PrintBoard()
+						fmt.Println()
+						fmt.Println("Press S or s to save - Press L or l to load - Press E or e to exit")
 						board.Turn++
 						board.MoveHistory(key, &board.MovesPlayerOne)
 						board.PrintMoves()
@@ -83,6 +86,8 @@ func main() {
 						break
 					} else if consoleOutput == "" {
 						board.PrintBoard()
+						fmt.Println()
+						fmt.Println("Press S or s to save - Press L or l to load - Press E or e to exit")
 						board.Turn++
 						board.MoveHistory(key, &board.MovesPlayerTwo)
 						board.PrintMoves()
@@ -106,6 +111,8 @@ func main() {
 						break
 					} else if consoleOutput == "" {
 						board.PrintBoard()
+						fmt.Println()
+						fmt.Println("Press S or s to save - Press L or l to load - Press E or e to exit")
 						board.Turn++
 						board.MoveHistory(key, &board.MovesPlayerOne)
 						board.PrintMoves()
@@ -123,6 +130,8 @@ func main() {
 						break
 					} else if consoleOutput == "" {
 						board.PrintBoard()
+						fmt.Println()
+						fmt.Println("Press S or s to save - Press L or l to load - Press E or e to exit")
 						board.Turn++
 						board.MoveHistory(key, &board.MovesPlayerTwo)
 						board.PrintMoves()
@@ -150,7 +159,7 @@ func checkForEnd(reader *bufio.Scanner, piece string, board *boardpackage.Board)
 	if gameOver {
 		if winner == "Draw" {
 			fmt.Println("The game is a draw.")
-			fmt.Println("Play again? Y/N")
+			fmt.Println("Play again? Y/N:")
 			reader.Scan()
 			response := reader.Text()
 			if response == "Y" || response == "y" {
@@ -161,7 +170,7 @@ func checkForEnd(reader *bufio.Scanner, piece string, board *boardpackage.Board)
 			}
 		} else {
 			fmt.Printf("Player %s  is the winner\n", piece)
-			fmt.Println("Play again? Y/N")
+			fmt.Println("Play again? Y/N:")
 			reader.Scan()
 			response := reader.Text()
 			if response == "Y" || response == "y" {
@@ -176,6 +185,7 @@ func checkForEnd(reader *bufio.Scanner, piece string, board *boardpackage.Board)
 }
 
 func bottomUi(reader *bufio.Scanner, board *boardpackage.Board, key *int, player string) string {
+	fmt.Printf("\nInput key: ")
 	reader.Scan()
 	consoleInput := reader.Text()
 
