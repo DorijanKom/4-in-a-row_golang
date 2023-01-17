@@ -58,25 +58,37 @@ func main() {
 			fmt.Println("input")
 			for {
 				if board.Turn%2 == 0 { // if turn counter is even then it's player1's turn, else it's player2's turn
-					bottomUi(reader, board, &key)
-					board.PrintBoard()
-					board.Turn++
-					moveHistory(key, &board.MovesPlayerOne)
-					board.PrintMoves()
-					gameOver := checkForEnd(reader, player1, board)
-					if !gameOver {
+					consoleOutput := bottomUi(reader, board, &key, player1)
+					if consoleOutput == "S" || consoleOutput == "s" {
+						continue
+					} else if consoleOutput == "L" || consoleOutput == "l" {
+						continue
+					} else if consoleOutput == "E" || consoleOutput == "e" {
 						break
+					} else if consoleOutput == "" {
+						board.PrintBoard()
+						board.Turn++
+						board.MoveHistory(key, &board.MovesPlayerOne)
+						board.PrintMoves()
+						checkForEnd(reader, player1, board)
 					}
+					continue
 				} else {
-					bottomUi(reader, board, &key)
-					board.PrintBoard()
-					board.Turn++
-					moveHistory(key, &board.MovesPlayerTwo)
-					board.PrintMoves()
-					gameOver := checkForEnd(reader, player2, board)
-					if !gameOver {
+					consoleOutput := bottomUi(reader, board, &key, player2)
+					if consoleOutput == "S" || consoleOutput == "s" {
+						continue
+					} else if consoleOutput == "L" || consoleOutput == "l" {
+						continue
+					} else if consoleOutput == "E" || consoleOutput == "e" {
 						break
+					} else if consoleOutput == "" {
+						board.PrintBoard()
+						board.Turn++
+						board.MoveHistory(key, &board.MovesPlayerTwo)
+						board.PrintMoves()
+						checkForEnd(reader, player2, board)
 					}
+					continue
 				}
 			}
 		}
@@ -85,19 +97,38 @@ func main() {
 			board.LoadGameList()
 			for {
 				if board.Turn%2 == 0 { // if turn counter is even then it's player1's turn, else it's player2's turn
-					bottomUi(reader, board, &key)
-					board.PrintBoard()
-					board.Turn++
-					moveHistory(key, &board.MovesPlayerOne)
-					board.PrintMoves()
-					//checkForEnd(reader, player1, board)
+					consoleOutput := bottomUi(reader, board, &key, player1)
+					if consoleOutput == "S" || consoleOutput == "s" {
+						continue
+					} else if consoleOutput == "L" || consoleOutput == "l" {
+						continue
+					} else if consoleOutput == "E" || consoleOutput == "e" {
+						break
+					} else if consoleOutput == "" {
+						board.PrintBoard()
+						board.Turn++
+						board.MoveHistory(key, &board.MovesPlayerOne)
+						board.PrintMoves()
+						checkForEnd(reader, player1, board)
+					}
+					continue
+
 				} else {
-					bottomUi(reader, board, &key)
-					board.PrintBoard()
-					board.Turn++
-					moveHistory(key, &board.MovesPlayerTwo)
-					board.PrintMoves()
-					//checkForEnd(reader, player2, board)
+					consoleOutput := bottomUi(reader, board, &key, player2)
+					if consoleOutput == "S" || consoleOutput == "s" {
+						continue
+					} else if consoleOutput == "L" || consoleOutput == "l" {
+						continue
+					} else if consoleOutput == "E" || consoleOutput == "e" {
+						break
+					} else if consoleOutput == "" {
+						board.PrintBoard()
+						board.Turn++
+						board.MoveHistory(key, &board.MovesPlayerTwo)
+						board.PrintMoves()
+						checkForEnd(reader, player2, board)
+					}
+					continue
 				}
 			}
 		}
@@ -110,16 +141,11 @@ func main() {
 
 }
 
-func moveHistory(key int, moves *[]int) {
-
-	*moves = append(*moves, key)
-}
-
 func checkRowCol(row, col int) bool {
 	return row >= 6 && col >= 7 && (col-row) <= 2
 }
 
-func checkForEnd(reader *bufio.Scanner, piece string, board *boardpackage.Board) bool {
+func checkForEnd(reader *bufio.Scanner, piece string, board *boardpackage.Board) {
 	gameOver, winner := board.EndGame()
 	if gameOver {
 		if winner == "Draw" {
@@ -129,7 +155,6 @@ func checkForEnd(reader *bufio.Scanner, piece string, board *boardpackage.Board)
 			response := reader.Text()
 			if response == "Y" || response == "y" {
 				board.ResetBoard()
-				return true
 			} else if response == "N" || response == "n" {
 				fmt.Println("Goodbye...")
 				os.Exit(1)
@@ -141,7 +166,6 @@ func checkForEnd(reader *bufio.Scanner, piece string, board *boardpackage.Board)
 			response := reader.Text()
 			if response == "Y" || response == "y" {
 				board.ResetBoard()
-				return true
 			} else if response == "N" || response == "n" {
 				fmt.Println("Goodbye...")
 				os.Exit(1)
@@ -149,10 +173,9 @@ func checkForEnd(reader *bufio.Scanner, piece string, board *boardpackage.Board)
 		}
 
 	}
-	return false
 }
 
-func bottomUi(reader *bufio.Scanner, board *boardpackage.Board, key *int) {
+func bottomUi(reader *bufio.Scanner, board *boardpackage.Board, key *int, player string) string {
 	reader.Scan()
 	consoleInput := reader.Text()
 
@@ -160,19 +183,31 @@ func bottomUi(reader *bufio.Scanner, board *boardpackage.Board, key *int) {
 		reader.Scan()
 		filename := reader.Text()
 		board.SaveGame(filename)
-		return
+		return consoleInput
 	} else if consoleInput == "L" || consoleInput == "l" {
 		board.LoadGameList()
-		return
+		return consoleInput
 	} else if consoleInput == "E" || consoleInput == "e" {
 		fmt.Println("Ending game...")
-		return
+		fmt.Println()
+		return consoleInput
 	}
+
+	// check if the input is a valid number
+	_, err := strconv.Atoi(consoleInput)
+	if err != nil {
+		fmt.Println("Invalid number")
+		return consoleInput
+	}
+
+	// convert the input to int
 	keyInput, _ := strconv.ParseInt(consoleInput, 10, 64)
 	*key = int(keyInput)
-	err := board.MakeMove(*key, player2)
+	err = board.MakeMove(*key, player)
 	if err != nil {
 		board.PrintBoard()
 		fmt.Println(err)
 	}
+
+	return ""
 }

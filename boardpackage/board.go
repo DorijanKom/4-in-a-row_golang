@@ -51,6 +51,8 @@ func (board *Board) ResetBoard() {
 	board.Turn = 0
 	board.MovesPlayerOne = []int{}
 	board.MovesPlayerTwo = []int{}
+
+	board.PrintBoard()
 }
 
 func (board *Board) PrintBoard() {
@@ -78,12 +80,20 @@ func (board *Board) MakeMove(key int, piece string) error {
 	return fmt.Errorf("the column is full")
 }
 
+func (board *Board) MoveHistory(key int, moves *[]int) {
+	if key < 0 || key > board.Cols {
+		board.Turn--
+		return
+	}
+	*moves = append(*moves, key)
+}
+
 func (board *Board) EndGame() (bool, string) {
 
 	// check for horizontal win
 	for i := 0; i < board.Rows; i++ {
 		for j := 0; j < board.Cols-3; j++ {
-			if board.State[i][j] != "" && board.State[i][j] == board.State[i][j+1] && board.State[i][j] == board.State[i][j+2] && board.State[i][j] == board.State[i][j+3] {
+			if board.State[i][j] != emptyField && board.State[i][j] == board.State[i][j+1] && board.State[i][j] == board.State[i][j+2] && board.State[i][j] == board.State[i][j+3] {
 				return true, board.State[i][j]
 			}
 		}
@@ -91,7 +101,7 @@ func (board *Board) EndGame() (bool, string) {
 	// check for vertical win
 	for i := 0; i < board.Rows-3; i++ {
 		for j := 0; j < board.Cols; j++ {
-			if board.State[i][j] != "" && board.State[i][j] == board.State[i+1][j] && board.State[i][j] == board.State[i+2][j] && board.State[i][j] == board.State[i+3][j] {
+			if board.State[i][j] != emptyField && board.State[i][j] == board.State[i+1][j] && board.State[i][j] == board.State[i+2][j] && board.State[i][j] == board.State[i+3][j] {
 				return true, board.State[i][j]
 			}
 		}
@@ -99,7 +109,7 @@ func (board *Board) EndGame() (bool, string) {
 	// check for diagonal win (left to right)
 	for i := 0; i < board.Rows-3; i++ {
 		for j := 0; j < board.Cols-3; j++ {
-			if board.State[i][j] != "" && board.State[i][j] == board.State[i+1][j+1] && board.State[i][j] == board.State[i+2][j+2] && board.State[i][j] == board.State[i+3][j+3] {
+			if board.State[i][j] != emptyField && board.State[i][j] == board.State[i+1][j+1] && board.State[i][j] == board.State[i+2][j+2] && board.State[i][j] == board.State[i+3][j+3] {
 				return true, board.State[i][j]
 			}
 		}
@@ -107,7 +117,7 @@ func (board *Board) EndGame() (bool, string) {
 	// check for diagonal win (right to left)
 	for i := 0; i < board.Rows-3; i++ {
 		for j := 3; j < board.Cols; j++ {
-			if board.State[i][j] != "" && board.State[i][j] == board.State[i+1][j-1] && board.State[i][j] == board.State[i+2][j-2] && board.State[i][j] == board.State[i+3][j-3] {
+			if board.State[i][j] != emptyField && board.State[i][j] == board.State[i+1][j-1] && board.State[i][j] == board.State[i+2][j-2] && board.State[i][j] == board.State[i+3][j-3] {
 				return true, board.State[i][j]
 			}
 		}
@@ -117,12 +127,12 @@ func (board *Board) EndGame() (bool, string) {
 	for i := 0; i < board.Rows; i++ {
 		for j := 0; j < board.Cols; j++ {
 			if board.State[i][j] == "" {
-				return false, ""
+				return true, "Draw"
 			}
 		}
 	}
 
-	return true, "Draw"
+	return false, ""
 
 }
 
@@ -153,6 +163,7 @@ func (board *Board) SaveGame(fileName string) error {
 
 	fmt.Println("Game saved!")
 	board.PrintBoard()
+	board.PrintMoves()
 	return nil
 }
 
@@ -221,8 +232,8 @@ func getSavedGames() ([]string, error) {
 
 func (board *Board) PrintMoves() {
 	fmt.Println()
-	fmt.Printf("%v ", board.MovesPlayerOne)
+	fmt.Printf("Black: %v ", board.MovesPlayerOne)
 	fmt.Println()
-	fmt.Printf("%v ", board.MovesPlayerTwo)
+	fmt.Printf("White: %v ", board.MovesPlayerTwo)
 	fmt.Println()
 }
