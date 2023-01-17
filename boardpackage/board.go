@@ -143,7 +143,7 @@ func (board *Board) SaveGame(fileName string) error {
 
 	save := strings.TrimSpace(fileName)
 
-	file, err := os.Create(save)
+	file, err := os.Create("saves/" + save)
 
 	if err != nil {
 		return err
@@ -163,6 +163,8 @@ func (board *Board) SaveGame(fileName string) error {
 
 	fmt.Println("Game saved!")
 	board.PrintBoard()
+	fmt.Println()
+	fmt.Println("Press S or s to save - Press L or l to load - Press E or e to exit")
 	board.PrintMoves()
 	return nil
 }
@@ -218,11 +220,14 @@ func (board *Board) LoadGameList() {
 
 	fmt.Println("Game loaded")
 	board.PrintBoard()
+	fmt.Println()
+	fmt.Println("Press S or s to save - Press L or l to load - Press E or e to exit")
+	board.PrintMoves()
 
 }
 
 func getSavedGames() ([]string, error) {
-	files, err := filepath.Glob("*.json")
+	files, err := filepath.Glob("saves/*.json")
 	if err != nil {
 		return nil, err
 	}
