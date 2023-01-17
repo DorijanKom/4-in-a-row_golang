@@ -22,4 +22,5 @@ After the installation, follow the steps down below in order to download the gam
 git clone https://github.com/DorijanKom/4-in-a-row_golang.git
 cd 4-in-a-row_golang
 go build
+./main
 ```
