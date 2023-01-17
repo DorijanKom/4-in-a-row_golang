@@ -40,6 +40,19 @@ func GenBoard(row, col int) *Board {
 	return board
 }
 
+func (board *Board) ResetBoard() {
+	board.State = [][]string{}
+	for i := 0; i < board.Rows; i++ {
+		board.State = append(board.State, make([]string, board.Cols))
+		for j := range board.State[i] {
+			board.State[i][j] = emptyField
+		}
+	}
+	board.Turn = 0
+	board.MovesPlayerOne = []int{}
+	board.MovesPlayerTwo = []int{}
+}
+
 func (board *Board) PrintBoard() {
 
 	for i := 0; i < board.Rows; i++ {

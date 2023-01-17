@@ -63,14 +63,20 @@ func main() {
 					board.Turn++
 					moveHistory(key, &board.MovesPlayerOne)
 					board.PrintMoves()
-					checkForEnd(reader, player1, board)
+					gameOver := checkForEnd(reader, player1, board)
+					if !gameOver {
+						break
+					}
 				} else {
 					bottomUi(reader, board, &key)
 					board.PrintBoard()
 					board.Turn++
 					moveHistory(key, &board.MovesPlayerTwo)
 					board.PrintMoves()
-					checkForEnd(reader, player2, board)
+					gameOver := checkForEnd(reader, player2, board)
+					if !gameOver {
+						break
+					}
 				}
 			}
 		}
@@ -84,14 +90,14 @@ func main() {
 					board.Turn++
 					moveHistory(key, &board.MovesPlayerOne)
 					board.PrintMoves()
-					checkForEnd(reader, player1, board)
+					//checkForEnd(reader, player1, board)
 				} else {
 					bottomUi(reader, board, &key)
 					board.PrintBoard()
 					board.Turn++
 					moveHistory(key, &board.MovesPlayerTwo)
 					board.PrintMoves()
-					checkForEnd(reader, player2, board)
+					//checkForEnd(reader, player2, board)
 				}
 			}
 		}
@@ -113,7 +119,7 @@ func checkRowCol(row, col int) bool {
 	return row >= 6 && col >= 7 && (col-row) <= 2
 }
 
-func checkForEnd(reader *bufio.Scanner, piece string, board *boardpackage.Board) {
+func checkForEnd(reader *bufio.Scanner, piece string, board *boardpackage.Board) bool {
 	gameOver, winner := board.EndGame()
 	if gameOver {
 		if winner == "Draw" {
@@ -122,8 +128,10 @@ func checkForEnd(reader *bufio.Scanner, piece string, board *boardpackage.Board)
 			reader.Scan()
 			response := reader.Text()
 			if response == "Y" || response == "y" {
-				return
+				board.ResetBoard()
+				return true
 			} else if response == "N" || response == "n" {
+				fmt.Println("Goodbye...")
 				os.Exit(1)
 			}
 		} else {
@@ -132,7 +140,8 @@ func checkForEnd(reader *bufio.Scanner, piece string, board *boardpackage.Board)
 			reader.Scan()
 			response := reader.Text()
 			if response == "Y" || response == "y" {
-				return
+				board.ResetBoard()
+				return true
 			} else if response == "N" || response == "n" {
 				fmt.Println("Goodbye...")
 				os.Exit(1)
@@ -140,6 +149,7 @@ func checkForEnd(reader *bufio.Scanner, piece string, board *boardpackage.Board)
 		}
 
 	}
+	return false
 }
 
 func bottomUi(reader *bufio.Scanner, board *boardpackage.Board, key *int) {
