@@ -1,187 +1,213 @@
 package main
 
 import (
+	"bufio"
+	"burch/4-in-a-row/boardpackage"
 	"fmt"
+	"os"
+	"strconv"
 )
-
-type Board struct {
-	state         [][]string
-	rows          int
-	cols          int
-	currentPlayer string
-}
 
 const (
-	emptyField string = " "
-	player1    string = "◯"
-	player2    string = "⬤"
+	player1 string = "◯"
+	player2 string = "⬤"
 )
-
-var movesPlayerOne []int
-var movesPlayerTwo []int
 
 func main() {
 
-	var row, col, key, userInput int
-	turn := 0
+	var row, col, key int
+	fmt.Println("\nWelcome to 4-in-a-row Go edition!\n")
+	reader := bufio.NewScanner(os.Stdin)
 
 	for {
 
-		fmt.Println("Press 1 for default board size - Press 2 for custom size")
-		fmt.Scan(&userInput)
+		fmt.Println("Press 1 new game - Press 2 to load an existing game - Press 3 to exit")
+		reader.Scan()
+		userInput, _ := strconv.ParseInt(reader.Text(), 10, 64)
 
 		if userInput == 1 {
-			row = 6
-			col = 7
-		}
+			fmt.Println("Press 1 for default size (6x7) - Press 2 for custom size")
+			reader.Scan()
+			gameInput, err := strconv.ParseInt(reader.Text(), 10, 64)
+			if gameInput == 1 {
+				row = 6
+				col = 7
+			} else if gameInput == 2 {
+				fmt.Println("Please input the number of rows for your game.")
+				reader.Scan()
+				rowInput, _ := strconv.ParseInt(reader.Text(), 10, 64)
+				row = int(rowInput)
 
-		if userInput == 2 {
-			fmt.Println("Please input the number of rows for your game.")
-			fmt.Scan(&row)
+				fmt.Println("Please enter the number of columns for your game.")
+				reader.Scan()
+				colInput, _ := strconv.ParseInt(reader.Text(), 10, 64)
+				col = int(colInput)
+			}
 
-			fmt.Println("Please enter the number of columns for your game.")
-			fmt.Scan(&col)
+			if err != nil {
+				fmt.Println("Invalid input!")
+			}
 
-		}
+			if !checkRowCol(row, col) {
+				fmt.Println("\nThe size difference between rows and cols must be at most 2 and it cannot be less than 6x7!\n")
+				continue
+			}
+			board := boardpackage.GenBoard(row, col)
 
-		if checkRowCol(row, col) {
-			board := genBoard(row, col)
-
-			board.printBoard()
+			board.PrintBoard()
 			fmt.Println("input")
 			for {
-				if turn%2 == 0 { // if turn counter is even then it's player1's turn, else it's player2's turn
-					fmt.Scan(&key)                      // takes user input
-					err := board.makeMove(key, player1) //cals make move function and saves response into the err variable
-					if err != nil {                     // checks for errors and handles them accordingly
-						board.printBoard()
-						fmt.Println(err)
+				if board.Turn%2 == 0 { // if turn counter is even then it's player1's turn, else it's player2's turn
+					consoleOutput := bottomUi(reader, board, &key, player1)
+					if consoleOutput == "S" || consoleOutput == "s" {
 						continue
+					} else if consoleOutput == "L" || consoleOutput == "l" {
+						continue
+					} else if consoleOutput == "E" || consoleOutput == "e" {
+						break
+					} else if consoleOutput == "" {
+						board.PrintBoard()
+						board.Turn++
+						board.MoveHistory(key, &board.MovesPlayerOne)
+						board.PrintMoves()
+						checkForEnd(reader, player1, board)
 					}
-					board.printBoard()
-					turn++
-					moveHistory(key, &movesPlayerOne)
-					fmt.Printf("%v ", movesPlayerOne)
-					fmt.Println()
-					fmt.Printf("%v ", movesPlayerTwo)
+					continue
+				} else {
+					consoleOutput := bottomUi(reader, board, &key, player2)
+					if consoleOutput == "S" || consoleOutput == "s" {
+						continue
+					} else if consoleOutput == "L" || consoleOutput == "l" {
+						continue
+					} else if consoleOutput == "E" || consoleOutput == "e" {
+						break
+					} else if consoleOutput == "" {
+						board.PrintBoard()
+						board.Turn++
+						board.MoveHistory(key, &board.MovesPlayerTwo)
+						board.PrintMoves()
+						checkForEnd(reader, player2, board)
+					}
+					continue
+				}
+			}
+		}
+		if userInput == 2 {
+			board := boardpackage.GenBoard(6, 7)
+			board.LoadGameList()
+			for {
+				if board.Turn%2 == 0 { // if turn counter is even then it's player1's turn, else it's player2's turn
+					consoleOutput := bottomUi(reader, board, &key, player1)
+					if consoleOutput == "S" || consoleOutput == "s" {
+						continue
+					} else if consoleOutput == "L" || consoleOutput == "l" {
+						continue
+					} else if consoleOutput == "E" || consoleOutput == "e" {
+						break
+					} else if consoleOutput == "" {
+						board.PrintBoard()
+						board.Turn++
+						board.MoveHistory(key, &board.MovesPlayerOne)
+						board.PrintMoves()
+						checkForEnd(reader, player1, board)
+					}
+					continue
 
 				} else {
-					fmt.Scan(&key)
-					err := board.makeMove(key, player2)
-					if err != nil {
-						board.printBoard()
-						fmt.Println(err)
+					consoleOutput := bottomUi(reader, board, &key, player2)
+					if consoleOutput == "S" || consoleOutput == "s" {
 						continue
+					} else if consoleOutput == "L" || consoleOutput == "l" {
+						continue
+					} else if consoleOutput == "E" || consoleOutput == "e" {
+						break
+					} else if consoleOutput == "" {
+						board.PrintBoard()
+						board.Turn++
+						board.MoveHistory(key, &board.MovesPlayerTwo)
+						board.PrintMoves()
+						checkForEnd(reader, player2, board)
 					}
-					board.printBoard()
-					turn++
-					moveHistory(key, &movesPlayerTwo)
-					fmt.Printf("%v ", movesPlayerOne)
-					fmt.Println()
-					fmt.Printf("%v ", movesPlayerTwo)
+					continue
 				}
-
 			}
 		}
-
-		fmt.Println("The size difference between rows and cols must be at most 2")
-
-	}
-}
-
-func genBoard(row, col int) Board {
-
-	// Creates new board struct
-	board := Board{
-		state:         make([][]string, row),
-		rows:          row,
-		cols:          col,
-		currentPlayer: "",
-	}
-
-	// Generates the 2d array (state)
-	for i := range board.state {
-		board.state[i] = make([]string, col)
-		for j := range board.state[i] {
-			board.state[i][j] = emptyField
+		if userInput == 3 {
+			fmt.Println("Goodbye...")
+			os.Exit(1)
 		}
+
 	}
 
-	return board
-}
-
-func (board *Board) printBoard() {
-
-	for i := board.rows - 1; i >= 0; i-- {
-		for j := 0; j < board.cols; j++ {
-			fmt.Printf(" [ %s  ] ", board.state[i][j])
-		}
-		fmt.Println()
-	}
-
-}
-
-func (board *Board) makeMove(key int, piece string) error {
-	if key < 0 || key-1 >= board.cols {
-		return fmt.Errorf("invalid column")
-	}
-	if board.state[board.rows-1][key-1] != emptyField {
-		return fmt.Errorf("the column is full")
-	}
-
-	for i := 0; i < board.rows; i++ {
-		if board.state[i][key-1] == emptyField {
-			board.state[i][key-1] = piece
-			break
-		}
-	}
-
-	return nil
-
-}
-
-func (board *Board) endGame(piece string) bool {
-
-	//horizontal check
-	for j := 0; j < board.rows-3; j++ {
-		for i := 0; i < board.rows; i++ {
-			if board.state[i][j] == piece && board.state[i][j+1] == piece && board.state[i][j+2] == piece && board.state[i][j+3] == piece {
-				fmt.Println("Victory")
-			}
-		}
-	}
-	//vertical check
-	for i := 0; i < board.cols-3; i++ {
-		for j := 0; j < board.rows; j++ {
-			if board.state[i][j] == piece && board.state[i][j+1] == piece && board.state[i][j+2] == piece && board.state[i][j+3] == piece {
-				fmt.Println("Victory")
-			}
-		}
-	}
-	//diagonal check left
-	for i := 3; i < board.cols; i++ {
-		for j := 0; j < board.rows-3; j++ {
-			if board.state[i][j] == piece && board.state[i-1][j+1] == piece && board.state[i-2][j+2] == piece && board.state[i-3][j+3] == piece {
-				fmt.Println("Victory")
-			}
-		}
-	}
-	//diagonal check right
-	for i := 0; i < board.cols; i++ {
-		for j := 3; j < board.rows-3; j++ {
-			if board.state[i][j] == piece && board.state[i-1][j-1] == piece && board.state[i-2][j-2] == piece && board.state[i-3][j-3] == piece {
-				fmt.Println("Victory")
-			}
-		}
-	}
-	return false
-}
-
-func moveHistory(key int, moves *[]int) {
-
-	*moves = append(*moves, key)
 }
 
 func checkRowCol(row, col int) bool {
-	return col-row == 2 || col-row <= 2 && col > 6 && row > 5
+	return row >= 6 && col >= 7 && (col-row) <= 2
+}
+
+func checkForEnd(reader *bufio.Scanner, piece string, board *boardpackage.Board) {
+	gameOver, winner := board.EndGame()
+	if gameOver {
+		if winner == "Draw" {
+			fmt.Println("The game is a draw.")
+			fmt.Println("Play again? Y/N")
+			reader.Scan()
+			response := reader.Text()
+			if response == "Y" || response == "y" {
+				board.ResetBoard()
+			} else if response == "N" || response == "n" {
+				fmt.Println("Goodbye...")
+				os.Exit(1)
+			}
+		} else {
+			fmt.Printf("Player %s  is the winner\n", piece)
+			fmt.Println("Play again? Y/N")
+			reader.Scan()
+			response := reader.Text()
+			if response == "Y" || response == "y" {
+				board.ResetBoard()
+			} else if response == "N" || response == "n" {
+				fmt.Println("Goodbye...")
+				os.Exit(1)
+			}
+		}
+
+	}
+}
+
+func bottomUi(reader *bufio.Scanner, board *boardpackage.Board, key *int, player string) string {
+	reader.Scan()
+	consoleInput := reader.Text()
+
+	if consoleInput == "S" || consoleInput == "s" {
+		reader.Scan()
+		filename := reader.Text()
+		board.SaveGame(filename)
+		return consoleInput
+	} else if consoleInput == "L" || consoleInput == "l" {
+		board.LoadGameList()
+		return consoleInput
+	} else if consoleInput == "E" || consoleInput == "e" {
+		fmt.Println("Ending game...")
+		fmt.Println()
+		return consoleInput
+	}
+
+	// check if the input is a valid number
+	_, err := strconv.Atoi(consoleInput)
+	if err != nil {
+		fmt.Println("Invalid number")
+		return consoleInput
+	}
+
+	// convert the input to int
+	keyInput, _ := strconv.ParseInt(consoleInput, 10, 64)
+	*key = int(keyInput)
+	err = board.MakeMove(*key, player)
+	if err != nil {
+		board.PrintBoard()
+		fmt.Println(err)
+	}
+
+	return ""
 }
